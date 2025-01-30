@@ -1,13 +1,13 @@
-import React, { createContext, useState, useCallback, useEffect } from 'react';
-import {validationRules} from '../utility/validation'
+import React, { createContext, useState, useCallback } from 'react';
+import { validationRules } from '../utility/validation';
+
 export const UserContext = createContext();
-
-
-
 
 const UserProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [shippingInfoReady, setShippingInfoReady] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [shippingInfoReady, setShippingInfoReady] = useState(false);
   const [userInfo, setUserInfo] = useState({
     username: '',
     password: '',
@@ -25,13 +25,61 @@ const UserProvider = ({ children }) => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-    // Validate a single field
-    const validateField = useCallback((name, value) => {
-      const validationRule = validationRules[name];
-      return validationRule ? validationRule(value) : '';
-    }, []);
+  // Handle login form input changes
+  const handleLoginChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setUserInfo(prev => ({ ...prev, [name]: value }));
+    setLoginError('');
+  }, []);
 
-      // Validate all fields
+  // Login submission handler
+  const handleLogin = useCallback(async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setLoginError('');
+
+    try {
+      const response = await fetch('https://fakestoreapi.com/users');
+      const users = await response.json();
+
+      // Find user by username/email and password
+      const user = users.find(u => 
+        (u.username === userInfo.username || u.email === userInfo.username) && 
+        u.password === userInfo.password
+      );
+
+      if (user) {
+        setIsLoggedIn(true);
+        // Pre-fill shipping info with user data
+        setShippingInfo(prev => ({
+          ...prev,
+          firstname: user.name.firstname,
+          lastname: user.name.lastname,
+          email: user.email,
+          phone: user.phone,
+          street1: user.address.street,
+          city: user.address.city,
+          'postal-code': user.address.zipcode,
+        }));
+        // Clear login error if any
+        setLoginError('');
+      } else {
+        setLoginError('Invalid username or password');
+      }
+    } catch (error) {
+      setLoginError('Login failed. Please try again.');
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userInfo]);
+
+  // Existing validation functions
+  const validateField = useCallback((name, value) => {
+    const validationRule = validationRules[name];
+    return validationRule ? validationRule(value) : '';
+  }, []);
+
   const validateForm = useCallback(() => {
     const newErrors = {};
     Object.keys(shippingInfo).forEach((field) => {
@@ -42,20 +90,16 @@ const UserProvider = ({ children }) => {
     return Object.keys(newErrors).length === 0;
   }, [shippingInfo, validateField]);
 
-    // Handle input change
-    const handleChange = useCallback((e) => {
-      const { name, value } = e.target;
-      setShippingInfo(prev => ({ ...prev, [name]: value }));
-      
-      // Validate field on change if it's been touched
-      if (touched[name]) {
-        const error = validateField(name, value);
-        setErrors(prev => ({ ...prev, [name]: error }));
-      }
-    }, [touched, validateField]);
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setShippingInfo(prev => ({ ...prev, [name]: value }));
+    
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors(prev => ({ ...prev, [name]: error }));
+    }
+  }, [touched, validateField]);
 
-
-     // Handle input blur
   const handleBlur = useCallback((e) => {
     const { name } = e.target;
     setTouched(prev => ({ ...prev, [name]: true }));
@@ -63,21 +107,36 @@ const UserProvider = ({ children }) => {
     setErrors(prev => ({ ...prev, [name]: error }));
   }, [shippingInfo, validateField]);
 
-  // Submit handler
   const handleSubmit = useCallback((e) => {
     e.preventDefault();
     setTouched(Object.keys(shippingInfo).reduce((acc, field) => ({ ...acc, [field]: true }), {}));
     
     const isValid = validateForm();
-    console.log(isValid)
     if (isValid) {
       setShippingInfoReady(true);
-      // Additional submit logic here
     }
   }, [shippingInfo, validateForm]);
-  
+
+  // Logout handler
+  const handleLogout = useCallback(() => {
+    setIsLoggedIn(false);
+    setUserInfo({ username: '', password: '' });
+    setShippingInfo({
+      firstname: '',
+      lastname: '',
+      phone: '',
+      email: '',
+      street1: '',
+      city: '',
+      'postal-code': '',
+    });
+    setShippingInfoReady(false);
+  }, []);
+
   const contextValue = {
     isLoggedIn,
+    isLoading,
+    loginError,
     shippingInfo,
     userInfo,
     errors,
@@ -86,7 +145,10 @@ const UserProvider = ({ children }) => {
     handleChange,
     handleBlur,
     handleSubmit,
-  }
+    handleLogin,
+    handleLoginChange,
+    handleLogout,
+  };
 
   return (
     <UserContext.Provider value={contextValue}>

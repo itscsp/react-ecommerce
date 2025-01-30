@@ -2,14 +2,23 @@ import React, { useContext, useEffect, useRef } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { IoMdCheckmarkCircleOutline } from 'react-icons/io';
 import { Link, useNavigate } from 'react-router-dom';
-import { convertCurrency } from '../utility/convert';
 import { CartContext } from '../contexts/CartContext';
 
 
 const OrderStatus = () => {
   const { shippingInfo, shippingInfoReady } = useContext(UserContext);
 const {cart, setCart, totalAmount} = useContext(CartContext)
-  
+
+        const navigate = useNavigate()
+
+      
+      useEffect(() => {
+   
+        if(cart.length < 1) {
+          navigate('/');
+        }
+      },[])
+
 
   const orderDetails = {
     orderId: "ORD-" + Math.random().toString(36).substr(2, 9).toUpperCase(),

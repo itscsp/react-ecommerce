@@ -53,12 +53,23 @@ const OrderSummary = () => {
         </div>
 
         {/* Proceed to Payment Button */}
+        {shippingInfoReady &&
         <Link disabled={!shippingInfoReady}
-          className={`block mt-6 w-full py-3 bg-blue-600 text-white text-lg font-semibold text-center rounded-md hover:bg-blue-700 transition ${!shippingInfoReady ? 'cursor-not-allowed opacity-50' : ''}`}
+          className={`block mt-6 w-full py-3 bg-blue-600 text-white text-lg font-semibold text-center rounded-md hover:bg-blue-700 transition `}
           to={'/order-status'}
         >
           Place Order
-        </Link>
+        </Link>}
+
+        {!shippingInfoReady &&
+        <button disabled={!shippingInfoReady}
+          className={`block mt-6 w-full py-3 bg-blue-600 text-white text-lg font-semibold text-center rounded-md hover:bg-blue-700 transition cursor-not-allowed opacity-50`}
+          to={'/order-status'}
+        >
+          Place Order
+        </button>}
+
+
       </div>
     </div>
   );
