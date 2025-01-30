@@ -7,3 +7,47 @@
     @apply font-primary text-primary;
   }
 }
+
+.header {
+  transition: top 0.5s ease, background-color 0.5s ease;
+}
+
+.cart-item-section{
+  height: calc(100vh - 225px);
+  min-height: 300px;
+  overflow-y:auto;
+  overflow-x: hidden;
+
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2; /* Ensure it’s on top */
+  cursor: pointer;
+}
+
+.heart-icon {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.heart-icon.active {
+  animation: pulse-animation 0.6s infinite;
+}
+
+@keyframes pulse-animation {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
