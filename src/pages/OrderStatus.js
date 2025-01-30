@@ -1,14 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { UserContext } from '../contexts/UserContext';
 import { IoMdCheckmarkCircleOutline } from 'react-icons/io';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { convertCurrency } from '../utility/convert';
 import { CartContext } from '../contexts/CartContext';
 
 
 const OrderStatus = () => {
   const { shippingInfo, shippingInfoReady } = useContext(UserContext);
-          const {cart, totalAmount} = useContext(CartContext)
+const {cart, setCart, totalAmount} = useContext(CartContext)
   
 
   const orderDetails = {
@@ -16,6 +16,28 @@ const OrderStatus = () => {
     orderDate: new Date().toLocaleDateString(),
     status: "Confirmed",
   };
+
+    // Inside your component:
+    // const navigate = useNavigate();
+
+    const clearCart = () => {
+        setCart([]);
+    };
+
+
+
+    const hasClearedCart = useRef(false);
+
+    useEffect(() => {
+        return () => {
+            if (!hasClearedCart.current) {
+                clearCart();
+                hasClearedCart.current = true;
+            }
+        };
+    }, []);
+    
+
 
   if (!shippingInfoReady) {
     return (
@@ -26,6 +48,8 @@ const OrderStatus = () => {
       </div>
     );
   }
+
+  
 
   return (
     <div className="max-w-3xl mx-auto p-6">
@@ -98,29 +122,6 @@ const OrderStatus = () => {
           </div>
         </div>
 
-        {/* Order Items */}
-        <div className="border-t pt-4">
-          <h3 className="font-semibold mb-3">Order Summary</h3>
-          <div className="space-y-3">
-            {cart.map((item) => {
-                          return (
-                            <li key={item.id} className="flex justify-between ">
-                              <span className="text-[12px]">{item.title} :</span>{" "}
-                              <span>
-                                {" "}
-                                {item.amount} * {convertCurrency(item.price)}
-                              </span>
-                            </li>
-                          );
-                        })}
-            <div className="border-t pt-3 mt-3">
-              <div className="flex justify-between items-center">
-                <p className="font-semibold">Total</p>
-                <p className="font-semibold">{convertCurrency(totalAmount)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Actions */}
