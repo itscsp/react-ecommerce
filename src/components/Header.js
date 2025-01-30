@@ -12,7 +12,7 @@ const Header = () => {
 
     useEffect(()=> {
       window.addEventListener('scroll', () => {
-        window.scrollY > 30 ? setIsActive(true) : setIsActive(false)
+        window.scrollY > 100 ? setIsActive(true) : setIsActive(false)
       })
     },[])
   

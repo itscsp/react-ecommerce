@@ -35,7 +35,7 @@ const PlaceOrder = () => {
           Checkout Process
         </h2>
 
-        {cart.length ? (
+        {/* {cart.length ? ( */}
 
         <div className="flex flex-col lg:flex-row items-start gap-10">
           {/* Left side: Tabs */}
@@ -52,10 +52,10 @@ const PlaceOrder = () => {
 
           <OrderSummary />
         </div>
-        ) : (
+        {/* ) : (
           <div> <p className='text-center'>Your Cart Is Empty! <Link className='text-blue-500' to="/">Add Products To Cart</Link></p></div>
         )
-        }
+        } */}
       </div>
     </section>
   );

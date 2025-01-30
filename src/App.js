@@ -11,6 +11,7 @@ import Footer from './components/Footer'
 import PlaceOrder from './pages/PlaceOrder';
 import CartList from './components/Cart/CartList';
 import WishList from './components/Wish/WishList';
+import OrderStatus from './pages/OrderStatus';
 
 
 const App = () => {
@@ -23,6 +24,8 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path='/product/:id' element={<ProductDetails />} />
         <Route path='/place-order' element={<PlaceOrder />} />
+        <Route path='/order-status' element={<OrderStatus />} />
+
       </Routes>
       <Footer />
     </Router>
